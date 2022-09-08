@@ -5,6 +5,7 @@ part of '../../routemaster.dart';
 class TabPage extends StatefulPage<void> with IndexedRouteMixIn {
   /// The content to be shown in the [Route] created by this page.
   final Widget child;
+  final Duration? anumationDuration;
 
   @override
   final List<String> paths;
@@ -22,11 +23,14 @@ class TabPage extends StatefulPage<void> with IndexedRouteMixIn {
     required this.paths,
     this.pageBuilder = _defaultPageBuilder,
     this.backBehavior = TabBackBehavior.none,
+    this.anumationDuration,
   });
 
   @override
   PageState createState() {
-    return TabPageState();
+    return TabPageState(
+      animationDuration: anumationDuration,
+    );
   }
 
   /// Retrieves the nearest [TabPageState] ancestor.
@@ -59,7 +63,10 @@ class _TabPageStateProvider extends InheritedNotifier {
 class TabPageState extends PageState<TabPage>
     with ChangeNotifier, IndexedPageStateMixIn {
   /// Initializes the state for a [TabPage].
-  TabPageState();
+  final Duration? animationDuration;
+  TabPageState({
+    required this.animationDuration,
+  });
 
   @override
   TabBackBehavior get backBehavior => page.backBehavior;
@@ -88,6 +95,7 @@ class TabPageState extends PageState<TabPage>
           pageState: this,
           child: page.child,
         ),
+        animationDuration: animationDuration,
       ),
     );
   }
@@ -102,10 +110,12 @@ class TabPageState extends PageState<TabPage>
 class _TabControllerProvider extends StatefulWidget {
   final Widget child;
   final TabPageState pageState;
+  final Duration? animationDuration;
 
   const _TabControllerProvider({
     required this.child,
     required this.pageState,
+    required this.animationDuration,
   });
 
   @override
@@ -139,6 +149,7 @@ class _TabControllerProviderState extends State<_TabControllerProvider>
     _controller = TabController(
       length: widget.pageState._routes.length,
       initialIndex: widget.pageState.index,
+      animationDuration: widget.animationDuration,
       vsync: this,
     )..addListener(() {
         widget.pageState.index = _controller!.index;
